@@ -11,14 +11,16 @@ export default class gameplay extends Phaser.Scene {
     this.load.image("bala electrica", "public/assets/bala electrica.png");
     this.load.image("boceto nave inical", "public/assets/boceto nave 1.png");
     this.load.image("revenator", "public/assets/revenator.png");
+    this.load.image("navedash", "public/assets/boceto nave dash 2.png");
   }
 
   create() {
     this.add.image(400, 300, "bala normal");
     this.add.image(400, 400, "bala electrica");
     this.add.image(400, 600, "revenator");
+    this.add.image(300, 300, "navedash");
 
-    this.player = this.physics.add.sprite(400, 300, "boceto nave inical");
+    this.player = this.physics.add.sprite(400, 300, "navedash");
 
     this.cursors = this.input.keyboard.createCursorKeys();
     this.keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
