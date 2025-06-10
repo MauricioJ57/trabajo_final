@@ -27,22 +27,27 @@ export default class gameplay extends Phaser.Scene {
   update() {
     if (this.cursors.left.isDown) {
       this.player.setVelocityX(-250);
+      this.player.flipX = false; 
     } else if (this.cursors.right.isDown) {
       this.player.setVelocityX(250);
+      this.player.flipX = true; 
     } else {
       this.player.setVelocityX(0);
     }
 
     if (this.cursors.up.isDown) {
       this.player.setVelocityY(-250);
+      this.player.flipY = false; 
     } else if (this.cursors.down.isDown) {
       this.player.setVelocityY(250);
+      this.player.flipY = true; 
     } else {
       this.player.setVelocityY(0);
     }
 
-    if (this.restart.isDown)
-      this.scene.restart("laberintojuego")
+    if (this.keyR.isDown) {
+      this.scene.restart();
+    }
         
   }
 
