@@ -22,29 +22,27 @@ export default class gameplay extends Phaser.Scene {
 
     this.player = this.physics.add.sprite(400, 300, "navedash");
 
-    this.cursors = this.input.keyboard.createCursorKeys();
-    this.keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+    this.input.on('pointermove', (pointer) => {
+      this.pointerX = pointer.worldX;
+      this.pointerY = pointer.worldY;
+    });
+
+    this.pointerX = this.player.x;
+    this.pointerY = this.player.y;
   }
 
   update() {
-    if (this.cursors.left.isDown) {
-      this.player.setVelocityX(-250);
-      this.player.flipX = false; 
-    } else if (this.cursors.right.isDown) {
-      this.player.setVelocityX(250);
-      this.player.flipX = true; 
+    const speed = 250;
+    const distanciax = this.pointerX - this.player.x;
+    const distanciay = this.pointerY - this.player.y;
+    const distance = Math.sqrt(distanciax * distanciax + distanciay * distanciay);
+    if (distance > 5) {
+      const angle = Math.atan2(distanciay, distanciax);
+      this.player.setVelocityX(Math.cos(angle) * speed);
+      this.player.setVelocityY(Math.sin(angle) * speed);
+      this.player.setRotation(angle + Phaser.Math.DegToRad(90));
     } else {
-      this.player.setVelocityX(0);
-    }
-
-    if (this.cursors.up.isDown) {
-      this.player.setVelocityY(-250);
-      this.player.flipY = false; 
-    } else if (this.cursors.down.isDown) {
-      this.player.setVelocityY(250);
-      this.player.flipY = true; 
-    } else {
-      this.player.setVelocityY(0);
+      this.player.setVelocity(0, 0);
     }
 
     if (this.keyR.isDown) {
