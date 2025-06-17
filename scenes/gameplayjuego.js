@@ -8,10 +8,11 @@ export default class gameplay extends Phaser.Scene {
 
   preload() {
     this.load.image("bala normal", "public/assets/bala normal(renovada).png");
-    this.load.image("bala electrica", "public/assets/bala electrica.png");
+    this.load.image('bala_electrica', "public/assets/bala electrica.png");
     this.load.image("boceto nave inical", "public/assets/boceto nave 1.png");
     this.load.image("revenator", "public/assets/revenator.png");
     this.load.image("navedash", "public/assets/boceto nave dash 2.png");
+    this.load.image('bala', "public/assets/bala normal(renovada).png")
   }
 
   create() {
@@ -20,7 +21,36 @@ export default class gameplay extends Phaser.Scene {
     this.add.image(400, 600, "revenator");
     this.add.image(300, 300, "navedash");
 
+    this.bala = "bala normal";
+
+    this.bulletsplayer = "bala normal";
+
+    this.bala_electrica = "bala electrica";
+
+    this.bullets = this.physics.add.group();
+
+    this.spawnBulletsup = this.time.addEvent({
+            delay: 200,
+            callback: () => {
+                const balas = {
+                    bala: { value: 5},
+                    bala_electrica: { value: 10}
+                };
+
+                const balaKeys = Object.keys(balas);
+                const balaSeleccionada = Phaser.Math.RND.pick(balaKeys);
+                const shape = this.bullets.create(Phaser.Math.Between(32, 900), 0, balaSeleccionada);
+                shape.setData('value', balas[balaSeleccionada].value);
+                shape.setScale(1);
+                shape.setVelocityY(270)
+                shape.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+            },
+            loop: true
+      });
+
     this.player = this.physics.add.sprite(400, 300, "navedash");
+
+    this.physics.add.collider(this.player,this.bullets);
 
     this.input.on('pointermove', (pointer) => {
       this.pointerX = pointer.worldX;
@@ -45,9 +75,9 @@ export default class gameplay extends Phaser.Scene {
       this.player.setVelocity(0, 0);
     }
 
-    if (this.keyR.isDown) {
+    /*if (this.keyR.isDown) {
       this.scene.restart();
-    }
+    }*/
         
   }
 
