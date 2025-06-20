@@ -50,6 +50,12 @@ export default class gameplay extends Phaser.Scene {
 
     this.player = this.physics.add.sprite(400, 300, "navedash");
 
+    /*this.bulletsplayer = this.physics.add.group();
+  this.input.keyboard.on('keydown-SPACE', () => {
+    const bullet_player = this.bulletsplayer.create(this.player.x, this.player.y - 20, 'bala');
+    bullet_player.setVelocityY(-300);
+  });*/
+  
     this.physics.add.collider(this.player,this.bullets);
 
     this.input.on('pointermove', (pointer) => {
@@ -74,7 +80,6 @@ export default class gameplay extends Phaser.Scene {
     } else {
       this.player.setVelocity(0, 0);
     }
-
     /*if (this.keyR.isDown) {
       this.scene.restart();
     }*/
