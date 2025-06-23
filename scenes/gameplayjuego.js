@@ -19,14 +19,17 @@ export default class gameplay extends Phaser.Scene {
     this.load.image('bala_verde', "public/assets/bala verde.png");
     this.load.image('bala_negra', "public/assets/bala negra.png");
     this.load.image('bala_veloz', "public/assets/bala veloz.png");
+    this.load.image('fondo', "public/assets/wallpaperbetter.jpg");
+    this.load.image('jefe_grande', "public/assets/jefe extra grande.png")
+    this.load.image('escudo', "public/assets/escudo.png");
+    this.load.image('corazones', "public/assets/corazones.png");
+    this.load.image('laser_grande', "public/assets/ataque laser(parte de sprite).png");
+    this.load.image('rayo_pequeño', "public/assets/rayo rojo(parte de sprite).png")
   }
 
   create() {
-    this.add.image(400, 300, "bala normal");
-    this.add.image(400, 400, "bala electrica");
-    this.add.image(400, 600, "revenator");
-    this.add.image(300, 300, "navedash");
-
+    this.add.image(400, 300, 'fondo');
+    
     this.scoretext = this.add.text(16, 16, 'Score: 0', {
       fontSize: '32px',
       fill: '#fff'
