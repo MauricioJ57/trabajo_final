@@ -5,6 +5,7 @@ export default class gameplay extends Phaser.Scene {
 
   init() {
     this.score = 0;
+    this.timer = 120;
   }
 
   preload() {
@@ -31,10 +32,32 @@ export default class gameplay extends Phaser.Scene {
       fill: '#fff'
     });
 
-    this.timertext = this.add.text(16, 50, 'Time: 0', {
+    this.timertext = this.add.text(16, 50, 'Time: ', {
       fontSize: '32px',
       fill: '#fff'
     });
+
+    this.timeleft = this.time.addEvent({
+            delay: 1000,
+            callback: () => {
+                if (this.timer > 0) {
+                   this.timer --;
+                   this.timertext.setText(`Time: ${this.timer}`); 
+                }
+                if (this.timer === 0) {
+                    this.timeleft.remove();
+                    this.spawnBulletsup.remove();
+                    this.input.off('pointerdown');
+                    this.lostgame = this.add.text(400, 300, 'Game Over', {
+                      fontSize: '64px',
+                      fill: '#ff0000'
+                    });
+                    this.lostgame.setOrigin(0.5, 0.5);
+                    this.physics.pause();
+                }
+            },
+            loop: true
+      });
 
     this.oleadatext = this.add.text(16, 100, 'Oleada: 0', {
       fontSize: '32px',
