@@ -102,8 +102,21 @@ export default class gameplay extends Phaser.Scene {
 
     this.bulletsplayer = this.physics.add.group();
       this.input.on('pointerdown', () => {
-        const bullet_player = this.bulletsplayer.create(this.player.x, this.player.y - 20, 'bala');
-       bullet_player.setVelocityY(-300);
+        
+        const angle = this.player.rotation - Phaser.Math.DegToRad(90); 
+        
+        const offset = 40; 
+        const bulletX = this.player.x + Math.cos(angle) * offset;
+        const bulletY = this.player.y + Math.sin(angle) * offset;
+        
+        const bullet_player = this.bulletsplayer.create(bulletX, bulletY, 'bala');
+        
+        const bulletSpeed = 300;
+        bullet_player.setVelocity(
+          Math.cos(angle) * bulletSpeed,
+          Math.sin(angle) * bulletSpeed
+        );
+        bullet_player.setRotation(this.player.rotation);
     }); // funcion para disparar balas
   
     this.physics.add.collider(this.player, this.bullets, (player, bullet) => {
@@ -139,7 +152,7 @@ export default class gameplay extends Phaser.Scene {
     const distanciax = this.pointerX - this.player.x;
     const distanciay = this.pointerY - this.player.y;
     const distance = Math.sqrt(distanciax * distanciax + distanciay * distanciay);
-    if (distance > 5) {
+    if (distance > 40) {
       const angle = Math.atan2(distanciay, distanciax);
       this.player.setVelocityX(Math.cos(angle) * speed);
       this.player.setVelocityY(Math.sin(angle) * speed);
