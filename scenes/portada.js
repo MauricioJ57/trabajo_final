@@ -13,13 +13,15 @@ export default class portada extends Phaser.Scene {
   }
 
   create () {
-    this.add.image(350, 400, 'fondo de boton');
-    this.add.text(350, 350, "JUGAR", { 
-        fontFamily: 'arial',
+    this.add.image(350, 400, 'fondo de boton').setScale(1);
+
+    this.add.text(350, 400, "JUGAR", { 
+        fontFamily: 'pixel',
         fontSize: '64px', 
         fill: '#fff' 
     }).setOrigin(0.5,0.5);
 
+    
   }
 
   update () {
