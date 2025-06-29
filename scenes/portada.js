@@ -9,11 +9,26 @@ export default class portada extends Phaser.Scene {
 
   preload () {
     this.load.image('fondo de boton', 'public/assets/fondo de boton.png');
+    this.load.image('boceto nave 1', 'public/assets/boceto nave 1.png');
 
   }
 
   create () {
-    this.add.image(350, 400, 'fondo de boton').setScale(1);
+    const image = this.add.image(0, 0, 'fondo de boton').setScale(1);
+
+    const container = this.add.container(350, 400, [image]);
+    container.setSize(300, 100);
+    container.setInteractive();
+    container.on('pointerover', () => {
+      image.setTint(0xff0000);
+    })
+    container.on('pointerout', () => {
+      image.clearTint();
+    })
+
+    container.once('pointerup', () => {
+      this.scene.start('gameplay');
+    });
 
     this.add.text(350, 400, "JUGAR", { 
         fontFamily: 'pixel',
@@ -21,7 +36,6 @@ export default class portada extends Phaser.Scene {
         fill: '#fff' 
     }).setOrigin(0.5,0.5);
 
-    
   }
 
   update () {

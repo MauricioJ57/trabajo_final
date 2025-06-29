@@ -5,7 +5,8 @@ export default class gameplay extends Phaser.Scene {
 
   init() {
     this.score = 0;
-    this.timer = 120;
+    this.timer = 10;
+    this.oleada = 1;
   }
 
   preload() {
@@ -58,6 +59,11 @@ export default class gameplay extends Phaser.Scene {
       fill: "#fff",
     });
 
+    this.oleadatext = this.add.text(16, 100, 'Oleada: ' + this.oleada, {
+      fontSize: "32px",
+      fill: "#fff",
+    });
+
     this.timeleft = this.time.addEvent({
       delay: 1000,
       callback: () => {
@@ -65,35 +71,27 @@ export default class gameplay extends Phaser.Scene {
           this.timer--;
           this.timertext.setText(`Time: ${this.timer}`);
         }
-        if (this.timer === 0) {
-          this.timeleft.remove();
-          this.spawnBulletsup.remove();
-          this.input.off("pointerdown");
-          this.lostgame = this.add.text(400, 300, "Game Over", {
-            fontSize: "64px",
-            fill: "#ff0000",
+        if (this.timer === 0 && !this.enOleada) {
+          // Fin de oleada: sumar 1, pausar balas, esperar 6 segundos y reiniciar
+          this.enOleada = true;
+          this.oleada++;
+          this.oleadatext.setText('Oleada: ' + this.oleada);
+          this.spawnBulletsup.paused = true;
+          this.timertext.setText('Oleada terminada');
+          this.time.delayedCall(6000, () => {
+            this.timer = 10;
+            this.timertext.setText(`Time: ${this.timer}`);
+            
+            this.spawnBulletsup.paused = false;
+            this.enOleada = false;
           });
-          this.lostgame.setOrigin(0.5, 0.5);
-          this.physics.pause();
+        }
+        if (this.timer === 0 && this.enOleada) {
+          // Evitar que se repita el proceso
+          return;
         }
       },
       loop: true,
-    });
-
-    if (this.timer <= 0) {
-      this.cambioOleada = this.oleada.addEvent({
-        delay: 5000,
-        callback: () => {
-          this.spawnBulletsup.remove();
-          this.timeleft.remove();
-          console.log("se activo la oleada");
-        },
-      });
-    }
-
-    this.oleadatext = this.add.text(16, 100, "Oleada: 0", {
-      fontSize: "32px",
-      fill: "#fff",
     });
 
     this.bala = "bala normal";
@@ -125,13 +123,11 @@ export default class gameplay extends Phaser.Scene {
         );
         shape.setData("value", balas[balaSeleccionada].value);
         shape.setScale(1);
-        shape.setVelocityY(100);
+        // La velocidad base es 100, y se suma 50 por cada oleada
+        const velocidadBala = 100 + (this.oleada - 1) * 15;
+        console.log("Velocidad de la bala:", velocidadBala);
+        shape.setVelocityY(velocidadBala);
         shape.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-
-        if (this.timer <= 0) {
-          shape.setVelocityY(+200);
-          console.log("se actualizo la velocidad");
-        }
       },
       loop: true,
     });
@@ -141,20 +137,20 @@ export default class gameplay extends Phaser.Scene {
 
     this.bulletsplayer = this.physics.add.group();
     this.input.keyboard.on("keydown-SPACE", () => {
-      const angle = this.player.rotation - Phaser.Math.DegToRad(90);
+      const bulletp = this.bulletsplayer.create(this.player.x + 20, this.player.y - 20, 'bala');
+      bulletp.setVelocityY(-300);
+    }); // funcion para disparar balas
 
-      const offset = 40;
-      const bulletX = this.player.x + Math.cos(angle) * offset;
-      const bulletY = this.player.y + Math.sin(angle) * offset;
+    this.bulletsplayer2 = this.physics.add.group();
+    this.input.keyboard.on("keydown-SPACE", () => {
+      const bulletp2 = this.bulletsplayer2.create(this.player.x - 20, this.player.y - 20, 'bala');
+      bulletp2.setVelocityY(-300);
+    }); // funcion para disparar balas
 
-      const bullet_player = this.bulletsplayer.create(bulletX, bulletY, "bala");
-
-      const bulletSpeed = 300;
-      bullet_player.setVelocity(
-        Math.cos(angle) * bulletSpeed,
-        Math.sin(angle) * bulletSpeed
-      );
-      bullet_player.setRotation(this.player.rotation);
+    this.bulletsplayer3 = this.physics.add.group();
+    this.input.keyboard.on("keydown-SPACE", () => {
+      const bulletp3 = this.bulletsplayer3.create(this.player.x, this.player.y - 20, 'bala');
+      bulletp3.setVelocityY(-300);
     }); // funcion para disparar balas
 
     this.physics.add.collider(this.player, this.bullets, (player, bullet) => {
@@ -187,6 +183,30 @@ export default class gameplay extends Phaser.Scene {
       }
     ); // funcion para destruir las balas del jugador y enemigas al chocar
 
+    this.physics.add.overlap(
+      this.bulletsplayer2,
+      this.bullets,
+      (playerBullet, enemyBullet) => {
+        const value = enemyBullet.getData("value") || 0;
+        this.score += value;
+        this.scoretext.setText("Score: " + this.score);
+        playerBullet.destroy();
+        enemyBullet.destroy();
+      }
+    );
+
+    this.physics.add.overlap(
+      this.bulletsplayer3,
+      this.bullets,
+      (playerBullet, enemyBullet) => {
+        const value = enemyBullet.getData("value") || 0;
+        this.score += value;
+        this.scoretext.setText("Score: " + this.score);
+        playerBullet.destroy();
+        enemyBullet.destroy();
+      }
+    );
+
     /*const graphics = this.make.graphics().fillStyle(0x00ff00).fillRect(0, 0, 800, 100);
 
     graphics.generateTexture('hudbar', 800, 100);
@@ -194,14 +214,6 @@ export default class gameplay extends Phaser.Scene {
     graphics.destroy();
 
     this.add.image(400, 300, 'hudbar');*/
-
-    /*this.input.on('pointermove', (pointer) => {
-      this.pointerX = pointer.worldX;
-      this.pointerY = pointer.worldY;
-    }); // funcion para mover al jugador con el mouse
-
-    this.pointerX = this.player.x;
-    this.pointerY = this.player.y;*/
   }
 
   update() {
@@ -221,18 +233,6 @@ export default class gameplay extends Phaser.Scene {
       this.player.setVelocityX(0);
     }
 
-    /*const speed = 250;
-    const distanciax = this.pointerX - this.player.x;
-    const distanciay = this.pointerY - this.player.y;
-    const distance = Math.sqrt(distanciax * distanciax + distanciay * distanciay);
-    if (distance > 40) {
-      const angle = Math.atan2(distanciay, distanciax);
-      this.player.setVelocityX(Math.cos(angle) * speed);
-      this.player.setVelocityY(Math.sin(angle) * speed);
-      this.player.setRotation(angle + Phaser.Math.DegToRad(90));
-    } else {
-      this.player.setVelocity(0, 0);
-    }*/
     if (this.restartKey.isDown) {
       this.scene.restart();
     }
