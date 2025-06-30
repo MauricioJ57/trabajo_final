@@ -23,13 +23,13 @@ const config = {
     default: "arcade",
     arcade: {
       gravity: { y: 0 },
-      debug: true,
+      debug: false,
     },
   },
   // List of scenes to load
   // Only the first scene will be shown
   // Remember to import the scene before adding it to the list
-  scene: [pantallaSeleccion,portada,gameplay],
+  scene: [portada,pantallaSeleccion,gameplay],
 };
 
 // Create a new Phaser game instance

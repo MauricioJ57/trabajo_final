@@ -5,7 +5,7 @@ export default class gameplay extends Phaser.Scene {
 
   init() {
     this.score = 0;
-    this.timer = 10;
+    this.timer = 120;
     this.oleada = 1;
   }
 
@@ -36,6 +36,7 @@ export default class gameplay extends Phaser.Scene {
     this.load.image('tiempoboton', "public/assets/boton de tiempo.png");
     this.load.image('oleadaboton', "public/assets/boton de oleada.png")
     this.load.image('hudscore', "public/assets/hud de score.png");
+    this.load.image('nave escudo', "public/assets/nave escudo.png")
   }
 
   create() {
@@ -47,9 +48,9 @@ export default class gameplay extends Phaser.Scene {
 
     this.add.image(250, 0, 'hudscore').setOrigin(0, 0);
 
-    this.jefe = this.physics.add.sprite(100, 100, "jefe_grande");
+    /*this.jefe = this.physics.add.sprite(100, 100, "jefe_grande");*/
 
-    this.tweens.add({
+    /*this.tweens.add({
       targets: this.jefe,
       x: 600,
       ease: "Linear",
@@ -57,7 +58,7 @@ export default class gameplay extends Phaser.Scene {
       repeat: -1,
       yoyo: true,
       loop: true,
-    });
+    });*/
 
     this.scoretext = this.add.text(350, 16, "Score: 0", {
       fontSize: "20px",
@@ -92,7 +93,7 @@ export default class gameplay extends Phaser.Scene {
           this.spawnBulletsup.paused = true;
           this.timertext.setText('Oleada terminada');
           this.time.delayedCall(6000, () => {
-            this.timer = 10;
+            this.timer = 120;
             this.timertext.setText(`${this.timer}`);
             
             this.spawnBulletsup.paused = false;
@@ -116,7 +117,7 @@ export default class gameplay extends Phaser.Scene {
     this.bullets = this.physics.add.group();
 
     this.spawnBulletsup = this.time.addEvent({
-      delay: 50,
+      delay: 200,
       callback: () => {
         const balas = {
           bala: { value: 5 },
@@ -163,7 +164,7 @@ export default class gameplay extends Phaser.Scene {
       loop: true,
     });
 
-    this.player = this.physics.add.sprite(400, 300, "navedash");
+    this.player = this.physics.add.sprite(400, 300, 'nave escudo');
     this.player.setCollideWorldBounds(true);
 
     this.bulletsplayer = this.physics.add.group();
@@ -259,11 +260,11 @@ export default class gameplay extends Phaser.Scene {
 
     pausabutton.once('pointerup', () => {
       this.scene.pause();
-      this.add.text(400, 300, "PAUSA", {
+      this.add.text(250, 300, "PAUSA", {
         fontSize: "64px",
         fill: "#fff",
         fontFamily: "arial",
-      }).setOrigin(0.5, 0.5);
+      }).setOrigin(0, 0);
     });
 
   }
