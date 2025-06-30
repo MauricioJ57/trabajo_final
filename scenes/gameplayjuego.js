@@ -32,10 +32,20 @@ export default class gameplay extends Phaser.Scene {
       "rayo_pequeño",
       "public/assets/rayo rojo(parte de sprite).png"
     );
+    this.load.image('pausa', "public/assets/pausa.png");
+    this.load.image('tiempoboton', "public/assets/boton de tiempo.png");
+    this.load.image('oleadaboton', "public/assets/boton de oleada.png")
+    this.load.image('hudscore', "public/assets/hud de score.png");
   }
 
   create() {
     this.add.image(400, 300, "fondo");
+
+    this.add.image(0, 12, 'tiempoboton').setOrigin(0, 0);
+
+    this.add.image(0, 45, 'oleadaboton').setOrigin(0, 0);
+
+    this.add.image(250, 0, 'hudscore').setOrigin(0, 0);
 
     this.jefe = this.physics.add.sprite(100, 100, "jefe_grande");
 
@@ -50,19 +60,19 @@ export default class gameplay extends Phaser.Scene {
     });
 
     this.scoretext = this.add.text(350, 16, "Score: 0", {
-      fontSize: "24px",
+      fontSize: "20px",
       fill: "#fff",
       fontFamily: "arial",
     }).setOrigin(0.5, 0);
 
-    this.timertext = this.add.text(16, 16, "Time: ", {
+    this.timertext = this.add.text(16, 16, `${this.timer}`, {
       fontSize: "24px",
       fill: "#fff",
       fontFamily: "arial",
     });
 
     this.oleadatext = this.add.text(16, 50, 'Oleada: ' + this.oleada, {
-      fontSize: "24px",
+      fontSize: "20px",
       fill: "#fff",
       fontFamily: "arial",
     });
@@ -72,7 +82,7 @@ export default class gameplay extends Phaser.Scene {
       callback: () => {
         if (this.timer > 0) {
           this.timer--;
-          this.timertext.setText(`Time: ${this.timer}`);
+          this.timertext.setText(`${this.timer}`);
         }
         if (this.timer === 0 && !this.enOleada) {
           // Fin de oleada: sumar 1, pausar balas, esperar 6 segundos y reiniciar
@@ -83,7 +93,7 @@ export default class gameplay extends Phaser.Scene {
           this.timertext.setText('Oleada terminada');
           this.time.delayedCall(6000, () => {
             this.timer = 10;
-            this.timertext.setText(`Time: ${this.timer}`);
+            this.timertext.setText(`${this.timer}`);
             
             this.spawnBulletsup.paused = false;
             this.enOleada = false;
@@ -235,6 +245,27 @@ export default class gameplay extends Phaser.Scene {
     graphics.destroy();
 
     this.add.image(400, 300, 'hudbar');*/
+
+    const pausabutton = this.add.image(650, 45, 'pausa');
+    pausabutton.setSize(36, 36);
+    pausabutton.setInteractive();
+    pausabutton.on('pointerover', () => {
+      pausabutton.setTint(0xfdd700);
+    });
+    pausabutton.on('pointerout', () => {
+      pausabutton.clearTint(); 
+    });
+    pausabutton.depth = 1;
+
+    pausabutton.once('pointerup', () => {
+      this.scene.pause();
+      this.add.text(400, 300, "PAUSA", {
+        fontSize: "64px",
+        fill: "#fff",
+        fontFamily: "arial",
+      }).setOrigin(0.5, 0.5);
+    });
+
   }
 
   update() {
