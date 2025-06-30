@@ -1,4 +1,5 @@
 import gameplay from "./scenes/gameplayjuego.js";
+import pantallaSeleccion from "./scenes/pantalla_seleccion.js";
 import portada from "./scenes/portada.js";
 
 // Create a new Phaser config object
@@ -28,7 +29,7 @@ const config = {
   // List of scenes to load
   // Only the first scene will be shown
   // Remember to import the scene before adding it to the list
-  scene: [portada,gameplay],
+  scene: [pantallaSeleccion,portada,gameplay],
 };
 
 // Create a new Phaser game instance
