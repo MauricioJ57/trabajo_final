@@ -20,7 +20,7 @@ export default class gameplay extends Phaser.Scene {
     this.load.image("bala_verde", "public/assets/bala verde.png");
     this.load.image("bala_negra", "public/assets/bala negra.png");
     this.load.image("bala_veloz", "public/assets/bala veloz.png");
-    this.load.image("fondo", "public/assets/wallpaperbetter.jpg");
+    this.load.image("fondo", "public/assets/fondo de gameplay (mejorado).jpg");
     this.load.image("jefe_grande", "public/assets/jefe extra grande.png");
     this.load.image("escudo", "public/assets/escudo.png");
     this.load.image("corazones", "public/assets/corazones.png");
@@ -49,19 +49,22 @@ export default class gameplay extends Phaser.Scene {
       loop: true,
     });
 
-    this.scoretext = this.add.text(16, 16, "Score: 0", {
-      fontSize: "32px",
+    this.scoretext = this.add.text(350, 16, "Score: 0", {
+      fontSize: "24px",
       fill: "#fff",
+      fontFamily: "arial",
+    }).setOrigin(0.5, 0);
+
+    this.timertext = this.add.text(16, 16, "Time: ", {
+      fontSize: "24px",
+      fill: "#fff",
+      fontFamily: "arial",
     });
 
-    this.timertext = this.add.text(16, 50, "Time: ", {
-      fontSize: "32px",
+    this.oleadatext = this.add.text(16, 50, 'Oleada: ' + this.oleada, {
+      fontSize: "24px",
       fill: "#fff",
-    });
-
-    this.oleadatext = this.add.text(16, 100, 'Oleada: ' + this.oleada, {
-      fontSize: "32px",
-      fill: "#fff",
+      fontFamily: "arial",
     });
 
     this.timeleft = this.time.addEvent({
@@ -103,7 +106,7 @@ export default class gameplay extends Phaser.Scene {
     this.bullets = this.physics.add.group();
 
     this.spawnBulletsup = this.time.addEvent({
-      delay: 100,
+      delay: 50,
       callback: () => {
         const balas = {
           bala: { value: 5 },
@@ -116,18 +119,36 @@ export default class gameplay extends Phaser.Scene {
 
         const balaKeys = Object.keys(balas);
         const balaSeleccionada = Phaser.Math.RND.pick(balaKeys);
-        const shape = this.bullets.create(
-          Phaser.Math.Between(32, 900),
-          0,
-          balaSeleccionada
-        );
+        const lado = Phaser.Math.Between(0, 2);
+        let x, y, velX = 0, velY = 0;
+        const velocidadBalaBase = 100 + (this.oleada - 1) * 15;
+        let velocidadBala = velocidadBalaBase;
+        if (balaSeleccionada === 'bala_veloz') {
+          velocidadBala += 100;
+        }
+        if (lado === 0) { 
+          x = Phaser.Math.Between(32, 900);
+          y = 0;
+          velY = velocidadBala;
+        } else if (lado === 1) { 
+          x = 0;
+          y = Phaser.Math.Between(32, 600);
+          velX = velocidadBala;
+        } else if (lado === 2) { 
+          x = 900;
+          y = Phaser.Math.Between(32, 600);
+          velX = -velocidadBala;
+        }
+        const shape = this.bullets.create(x, y, balaSeleccionada);
         shape.setData("value", balas[balaSeleccionada].value);
         shape.setScale(1);
-        // La velocidad base es 100, y se suma 50 por cada oleada
-        const velocidadBala = 100 + (this.oleada - 1) * 15;
-        console.log("Velocidad de la bala:", velocidadBala);
-        shape.setVelocityY(velocidadBala);
         shape.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+        if (balaSeleccionada === 'bala_negra') {
+          shape.setData('esNegra', true);
+          // No le damos velocidad aquí, se actualizará en update
+        } else {
+          shape.setVelocity(velX, velY);
+        }
       },
       loop: true,
     });
@@ -236,5 +257,19 @@ export default class gameplay extends Phaser.Scene {
     if (this.restartKey.isDown) {
       this.scene.restart();
     }
+
+    // Hacer que las balas negras sigan al jugador
+    this.bullets.getChildren().forEach(bullet => {
+      if (bullet.getData('esNegra')) {
+        const dx = this.player.x - bullet.x;
+        const dy = this.player.y - bullet.y;
+        const angle = Math.atan2(dy, dx);
+        const velocidadBalaBase = 100 + (this.oleada - 1) * 15;
+        let velocidadBala = velocidadBalaBase;
+        // Si quieres que la bala negra sea más rápida, puedes sumar aquí
+        bullet.setVelocity(Math.cos(angle) * velocidadBala, Math.sin(angle) * velocidadBala);
+        bullet.setRotation(angle + Phaser.Math.DegToRad(90));
+      }
+    });
   }
 }

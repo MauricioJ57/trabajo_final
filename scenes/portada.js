@@ -20,7 +20,7 @@ export default class portada extends Phaser.Scene {
     container.setSize(300, 100);
     container.setInteractive();
     container.on('pointerover', () => {
-      image.setTint(0xff0000);
+      image.setTint(0xf0000); // Change color to yellow on hover
     })
     container.on('pointerout', () => {
       image.clearTint();
@@ -31,8 +31,8 @@ export default class portada extends Phaser.Scene {
     });
 
     this.add.text(350, 400, "JUGAR", { 
-        fontFamily: 'pixel',
-        fontSize: '64px', 
+        fontFamily: 'arial',
+        fontSize: '32px', 
         fill: '#fff' 
     }).setOrigin(0.5,0.5);
 
