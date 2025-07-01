@@ -33,7 +33,7 @@ export default class portada extends Phaser.Scene {
     })
 
     container.once('pointerup', () => {
-      this.scene.start('gameplay');
+      this.scene.start('pregameplay');
     });
 
     this.add.text(350, 400, "JUGAR", { 

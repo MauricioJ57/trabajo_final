@@ -40,13 +40,11 @@ export default class gameplay extends Phaser.Scene {
     this.load.image('nave escudo', "public/assets/nave escudo.png")
   }
 
-  create() {
+  create(data) {
     this.add.image(400, 300, "fondo");
 
     this.add.image(0, 12, 'tiempoboton').setOrigin(0, 0).setDepth(1000);
-
     this.add.image(0, 45, 'oleadaboton').setOrigin(0, 0).setDepth(1000);
-
     this.add.image(250, 0, 'hudscore').setOrigin(0, 0).setDepth(1000);
 
     // --- Jefe y patrón de balas del jefe ---
@@ -54,6 +52,9 @@ export default class gameplay extends Phaser.Scene {
     this.bossActive = false;
     this.bossBullets = this.physics.add.group();
     this.circlebullets = null;
+
+    // Sprite seleccionado recibido desde pantalla_seleccion
+    this.spriteSeleccionado = (data && data.spriteSeleccionado) ? data.spriteSeleccionado : 'nave escudo';
 
     // Función para activar el jefe y su patrón de balas
     this.activateBoss = () => {
@@ -241,7 +242,7 @@ export default class gameplay extends Phaser.Scene {
       loop: true,
     }); //funcion para generar balas aleatorias
 
-    this.player = this.physics.add.sprite(400, 300, 'nave escudo');
+    this.player = this.physics.add.sprite(400, 300, this.spriteSeleccionado);
     this.player.setCollideWorldBounds(true);
     this.player.setData('vida', 3);
     // informacion de player
