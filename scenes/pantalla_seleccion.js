@@ -43,11 +43,12 @@ export default class pantallaSeleccion extends Phaser.Scene {
           dash.clearTint();
         })
 
-        let spriteSeleccionado = 'nave escudo'; // valor por defecto
-
-        container_d.once('pointerup', () => {
+        // Variable para la nave seleccionada
+        this.naveSeleccionada = null;
+        // Mostrar selección y guardar valor
+        container_d.on('pointerup', () => {
+          this.naveSeleccionada = 'ejemplo nave dash';
           this.add.image(590, 250, 'ejemplo nave dash').setOrigin(0, 0);
-          spriteSeleccionado = 'navedash';
         });
 
         const escudo = this.add.image(0, 0, 'naveescudoselector')
@@ -62,9 +63,9 @@ export default class pantallaSeleccion extends Phaser.Scene {
           escudo.clearTint();
         })
 
-        container_e.once('pointerup', () => {
+        container_e.on('pointerup', () => {
+          this.naveSeleccionada = 'ejemplo nave escudo';
           this.add.image(600, 250, 'ejemplo nave escudo').setOrigin(0, 0);
-          spriteSeleccionado = 'nave escudo';
         });
 
         const rayo_grande = this.add.image(0, 0, 'naverayograndeselector');
@@ -79,9 +80,9 @@ export default class pantallaSeleccion extends Phaser.Scene {
           rayo_grande.clearTint();
         })
 
-        container_rg.once('pointerup', () => {
+        container_rg.on('pointerup', () => {
+          this.naveSeleccionada = 'ejemplo nave rayo grande';
           this.add.image(590, 250, 'ejemplo nave rayo grande').setOrigin(0, 0);
-          spriteSeleccionado = 'boceto nave inical';
         });
         
         const botonJugar = this.add.image(0, 0, 'boton jugar');
@@ -97,7 +98,9 @@ export default class pantallaSeleccion extends Phaser.Scene {
         });
 
         container_jugar.once('pointerup', () => {
-          this.scene.start('gameplay', { spriteSeleccionado });
+          // Si no se seleccionó nave, por defecto la de escudo
+          const nave = this.naveSeleccionada || 'ejemplo nave escudo';
+          this.scene.start('gameplay', { naveSeleccionada: nave });
         });
 
         this.add.text(280, 620, "JUGAR", { 

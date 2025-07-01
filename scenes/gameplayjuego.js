@@ -24,7 +24,6 @@ export default class gameplay extends Phaser.Scene {
     this.load.image("fondo", "public/assets/fondo de gameplay (mejorado).jpg");
     this.load.image('jefe_grande', "public/assets/jefe extra grande.png");
     this.load.image("escudo", "public/assets/escudo.png");
-    this.load.image("corazones", "public/assets/corazones.png");
     this.load.image(
       "laser_grande",
       "public/assets/ataque laser(parte de sprite).png"
@@ -37,7 +36,11 @@ export default class gameplay extends Phaser.Scene {
     this.load.image('tiempoboton', "public/assets/boton de tiempo.png");
     this.load.image('oleadaboton', "public/assets/boton de oleada.png")
     this.load.image('hudscore', "public/assets/hud de score.png");
-    this.load.image('nave escudo', "public/assets/nave escudo.png")
+    this.load.image('nave escudo', "public/assets/nave escudo.png");
+    this.load.audio('explosion de balas', "public/assets/explosion de balas2.wav");
+    this.load.image('bala del jugador', "public/assets/bala de jugador.png");
+    this.load.image('boton de habilidad', "public/assets/boton de habilidad 3.png");
+
   }
 
   create(data) {
@@ -46,6 +49,7 @@ export default class gameplay extends Phaser.Scene {
     this.add.image(0, 12, 'tiempoboton').setOrigin(0, 0).setDepth(1000);
     this.add.image(0, 45, 'oleadaboton').setOrigin(0, 0).setDepth(1000);
     this.add.image(250, 0, 'hudscore').setOrigin(0, 0).setDepth(1000);
+    this.add.image(550, 550, 'boton de habilidad').setOrigin(0, 0).setDepth(1000).setAlpha(0.8);
 
     // --- Jefe y patrón de balas del jefe ---
     this.boss = null;
@@ -55,6 +59,9 @@ export default class gameplay extends Phaser.Scene {
 
     // Sprite seleccionado recibido desde pantalla_seleccion
     this.spriteSeleccionado = (data && data.spriteSeleccionado) ? data.spriteSeleccionado : 'nave escudo';
+
+    // Guardar la nave seleccionada
+    this.naveSeleccionada = (data && data.naveSeleccionada) ? data.naveSeleccionada : 'ejemplo nave escudo';
 
     // Función para activar el jefe y su patrón de balas
     this.activateBoss = () => {
@@ -242,13 +249,13 @@ export default class gameplay extends Phaser.Scene {
       loop: true,
     }); //funcion para generar balas aleatorias
 
-    this.player = this.physics.add.sprite(400, 300, this.spriteSeleccionado);
+    this.player = this.physics.add.sprite(400, 300, this.naveSeleccionada);
     this.player.setCollideWorldBounds(true);
     this.player.setData('vida', 3);
     // informacion de player
 
     // Mostrar vidas en pantalla
-    this.vidasText = this.add.text(16, 150, 'Vidas: 3', {
+    this.vidasText = this.add.text(16, 150, 'Vidas: ', {
       fontSize: '24px',
       fill: '#fff',
       fontFamily: 'arial',
@@ -257,23 +264,24 @@ export default class gameplay extends Phaser.Scene {
 
     this.bulletsplayer = this.physics.add.group();
     this.input.keyboard.on("keydown-SPACE", () => {
-      const bulletp = this.bulletsplayer.create(this.player.x + 20, this.player.y - 20, 'bala');
+      const bulletp = this.bulletsplayer.create(this.player.x + 20, this.player.y - 20, 'bala del jugador');
       bulletp.setVelocityY(-300);
     }); // funcion para disparar balas
 
     this.bulletsplayer2 = this.physics.add.group();
     this.input.keyboard.on("keydown-SPACE", () => {
-      const bulletp2 = this.bulletsplayer2.create(this.player.x - 20, this.player.y - 20, 'bala');
+      const bulletp2 = this.bulletsplayer2.create(this.player.x - 20, this.player.y - 20, 'bala del jugador');
       bulletp2.setVelocityY(-300);
     }); // funcion para disparar balas
 
     this.bulletsplayer3 = this.physics.add.group();
     this.input.keyboard.on("keydown-SPACE", () => {
-      const bulletp3 = this.bulletsplayer3.create(this.player.x, this.player.y - 20, 'bala');
+      const bulletp3 = this.bulletsplayer3.create(this.player.x, this.player.y - 20, 'bala del jugador');
       bulletp3.setVelocityY(-300);
     }); // funcion para disparar balas
 
-    this.physics.add.collider(this.player, this.bullets, (player, bullet) => {
+    // Guardar el collider entre el jugador y las balas para poder activarlo/desactivarlo
+    this.playerBulletsCollider = this.physics.add.collider(this.player, this.bullets, (player, bullet) => {
       let vidas = player.getData('vida');
       vidas--;
       player.setData('vida', vidas);
@@ -310,6 +318,20 @@ export default class gameplay extends Phaser.Scene {
     this.restartKey = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.R
     );// controles
+    this.laserKey = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.X
+    );
+
+    // Grupo para los sprites del láser
+    this.laserSprites = [];
+    this.laserActive = false;
+    this.laserLength = 25; // cantidad de sprites que forman el rayo
+    this.laserSpacing = 32; // separación entre sprites (ajustar según tamaño del sprite)
+    this.laserCooldown = false; // para evitar reactivar el láser durante el efecto
+    this.laserTimer = null;
+    this.laserRechargeTimer = null;
+
+    this.laserattack = this.physics.add.group()
 
     this.physics.add.overlap(
       this.bulletsplayer,
@@ -320,9 +342,9 @@ export default class gameplay extends Phaser.Scene {
         this.scoretext.setText("Score: " + this.score);
         playerBullet.destroy();
         enemyBullet.destroy();
+        if (this.explosionAudio) this.explosionAudio.play();
       }
-    ); // funcion para destruir las balas del jugador y enemigas al chocar
-
+    );
     this.physics.add.overlap(
       this.bulletsplayer2,
       this.bullets,
@@ -332,9 +354,9 @@ export default class gameplay extends Phaser.Scene {
         this.scoretext.setText("Score: " + this.score);
         playerBullet.destroy();
         enemyBullet.destroy();
+        if (this.explosionAudio) this.explosionAudio.play();
       }
-    ); //colision ente balas de jugador y enemigas
-
+    );
     this.physics.add.overlap(
       this.bulletsplayer3,
       this.bullets,
@@ -344,8 +366,9 @@ export default class gameplay extends Phaser.Scene {
         this.scoretext.setText("Score: " + this.score);
         playerBullet.destroy();
         enemyBullet.destroy();
+        if (this.explosionAudio) this.explosionAudio.play();
       }
-    ); //colision entre balas de jugador y enemigas
+    ); //colision ente balas de jugador y enemigas
 
     const pausabutton = this.add.image(650, 45, 'pausa');
     pausabutton.setSize(36, 36);
@@ -406,6 +429,31 @@ export default class gameplay extends Phaser.Scene {
       loop: true,
     });
 
+    // Guardar referencia al audio
+    this.explosionAudio = this.sound.add('explosion de balas');
+
+    // Texto de ayuda para controles de movimiento
+    this.controlesMostrados = true;
+    this.teclasPresionadas = { up: false, down: false, left: false, right: false };
+    this.textoControles = this.add.text(220, 560, 'Mueve tu nave con las flechas', {
+      fontSize: '15px',
+      fill: '#fff',
+      fontFamily: 'arial',
+      padding: { left: 10, right: 10, top: 5, bottom: 5 },
+    }).setDepth(2000);
+    // Texto de ayuda para disparo (barra espaciadora)
+    this.controlesBMostrados = true;
+    this.teclasBPresionadas = { SPACE: false };
+    this.textoControlesB = this.add.text(220, 600, 'presiona la barra espaciadora para disparar', {
+      fontSize: '15px',
+      fill: '#fff',
+      fontFamily: 'arial',
+      padding: { left: 10, right: 10, top: 5, bottom: 5 },
+    }).setDepth(2000);
+
+    // Botón de habilidad visual
+    this.botonHabilidad = this.add.image(550, 550, 'boton de habilidad').setOrigin(0, 0).setDepth(1000).setAlpha(0.8);
+    this.botonHabilidad.setTint(0xffffff); // Sin oscurecer al inicio
   }
 
   update() {
@@ -429,6 +477,134 @@ export default class gameplay extends Phaser.Scene {
       this.scene.restart();
     } // boton de reinicio
 
+    // --- ATAQUE LÁSER CONTINUO (solo si nave seleccionada es 'ejemplo nave rayo grande') ---
+    if (
+      this.naveSeleccionada === 'ejemplo nave rayo grande' &&
+      Phaser.Input.Keyboard.JustDown(this.laserKey) &&
+      !this.laserActive &&
+      !this.laserCooldown
+    ) {
+      this.laserActive = true;
+      this.laserCooldown = true;
+      if (this.botonHabilidad) this.botonHabilidad.setTint(0x444444); // Oscurecer botón
+      // Crear sprites del láser
+      for (let i = 0; i < this.laserLength; i++) {
+        const laserY = this.player.y - 10 - i * this.laserSpacing;
+        const laserSprite = this.physics.add.sprite(this.player.x, laserY, 'laser_grande');
+        laserSprite.setOrigin(0.5, 1);
+        laserSprite.setDepth(999);
+        laserSprite.body.allowGravity = false;
+        laserSprite.body.immovable = true;
+        this.laserSprites.push(laserSprite);
+      }
+      // No crear escudo aquí
+      // Activar colisión entre cada sprite del láser y las balas enemigas
+      this.laserCollider = [];
+      this.laserSprites.forEach(laserSprite => {
+        const collider = this.physics.add.overlap(laserSprite, this.bullets, (laser, enemyBullet) => {
+          const value = enemyBullet.getData("value") || 0;
+          this.score += value;
+          this.scoretext.setText("Score: " + this.score);
+          enemyBullet.destroy();
+          if (this.explosionAudio) this.explosionAudio.play();
+        });
+        this.laserCollider.push(collider);
+      });
+      // Temporizador para desactivar el láser después de 5 segundos
+      this.laserTimer = this.time.delayedCall(5000, () => {
+        this.laserActive = false;
+        this.laserSprites.forEach(sprite => sprite.destroy());
+        this.laserSprites = [];
+        if (this.laserCollider) {
+          this.laserCollider.forEach(collider => collider.destroy());
+          this.laserCollider = null;
+        }
+        // Iniciar recarga de 5 segundos adicionales
+        this.laserRechargeTimer = this.time.delayedCall(5000, () => {
+          this.laserCooldown = false;
+          if (this.botonHabilidad) this.botonHabilidad.setTint(0xffffff); // Restaurar color
+        });
+      });
+    }
+    // --- ESCUDO (solo si nave seleccionada es 'ejemplo nave escudo') ---
+    if (
+      this.naveSeleccionada === 'ejemplo nave escudo' &&
+      Phaser.Input.Keyboard.JustDown(this.laserKey) &&
+      !this.escudoActive &&
+      !this.laserCooldown
+    ) {
+      this.escudoActive = true;
+      this.laserCooldown = true;
+      if (this.botonHabilidad) this.botonHabilidad.setTint(0x444444); // Oscurecer botón
+      this.escudoHits = 3;
+      this.escudoSprite = this.physics.add.sprite(this.player.x, this.player.y, 'escudo');
+      this.escudoSprite.setOrigin(0.5, 0.5);
+      this.escudoSprite.setDepth(1001);
+      this.escudoSprite.setScale(1.2);
+      // Desactivar colisión jugador-balas
+      if (this.playerBulletsCollider) this.playerBulletsCollider.active = false;
+      // Colisión entre escudo y balas enemigas
+      this.escudoCollider = this.physics.add.overlap(this.escudoSprite, this.bullets, (escudo, enemyBullet) => {
+        this.escudoHits--;
+        enemyBullet.destroy();
+        if (this.explosionAudio) this.explosionAudio.play();
+        if (this.escudoHits <= 0) {
+          this.escudoActive = false;
+          if (this.escudoSprite) {
+            this.escudoSprite.destroy();
+            this.escudoSprite = null;
+          }
+          if (this.escudoCollider) {
+            this.escudoCollider.destroy();
+            this.escudoCollider = null;
+          }
+          // Reactivar colisión jugador-balas
+          if (this.playerBulletsCollider) this.playerBulletsCollider.active = true;
+          // Cancelar temporizador si existe
+          if (this.escudoTimer) {
+            this.escudoTimer.remove(false);
+            this.escudoTimer = null;
+          }
+          // Iniciar recarga de 5 segundos adicionales
+          this.laserRechargeTimer = this.time.delayedCall(5000, () => {
+            this.laserCooldown = false;
+            if (this.botonHabilidad) this.botonHabilidad.setTint(0xffffff); // Restaurar color
+          });
+        }
+      });
+      this.escudoTimer = this.time.delayedCall(5000, () => {
+        this.escudoActive = false;
+        if (this.escudoSprite) {
+          this.escudoSprite.destroy();
+          this.escudoSprite = null;
+        }
+        if (this.escudoCollider) {
+          this.escudoCollider.destroy();
+          this.escudoCollider = null;
+        }
+        // Reactivar colisión jugador-balas
+        if (this.playerBulletsCollider) this.playerBulletsCollider.active = true;
+        // Iniciar recarga de 5 segundos adicionales
+        this.laserRechargeTimer = this.time.delayedCall(5000, () => {
+          this.laserCooldown = false;
+          if (this.botonHabilidad) this.botonHabilidad.setTint(0xffffff); // Restaurar color
+        });
+      });
+    }
+    // Si el láser está activo, seguir la nave
+    if (this.laserActive) {
+      for (let i = 0; i < this.laserSprites.length; i++) {
+        const laserY = this.player.y - 0 - i * this.laserSpacing;
+        this.laserSprites[i].x = this.player.x;
+        this.laserSprites[i].y = laserY;
+      }
+    }
+    // Si el escudo está activo, seguir la nave
+    if (this.escudoActive && this.escudoSprite) {
+      this.escudoSprite.x = this.player.x;
+      this.escudoSprite.y = this.player.y;
+    }
+
     // Hacer que las balas negras sigan al jugador
     this.bullets.getChildren().forEach(bullet => {
       if (bullet.getData('esNegra')) {
@@ -442,5 +618,27 @@ export default class gameplay extends Phaser.Scene {
         bullet.setRotation(angle + Phaser.Math.DegToRad(90));
       }
     });
+
+    // --- Ocultar texto de controles cuando se presionen todas las teclas de movimiento (solo flechas) ---
+    if (this.controlesMostrados) {
+      if (this.cursors.up.isDown) this.teclasPresionadas.up = true;
+      if (this.cursors.down.isDown) this.teclasPresionadas.down = true;
+      if (this.cursors.left.isDown) this.teclasPresionadas.left = true;
+      if (this.cursors.right.isDown) this.teclasPresionadas.right = true;
+      if (this.teclasPresionadas.up && this.teclasPresionadas.down && this.teclasPresionadas.left && this.teclasPresionadas.right) {
+        this.textoControles.destroy();
+        this.controlesMostrados = false;
+      }
+    }
+    // --- Ocultar texto de ayuda de disparo (barra espaciadora) ---
+    if (this.controlesBMostrados) {
+      if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE))) {
+        this.teclasBPresionadas.SPACE = true;
+        if (this.textoControlesB) {
+          this.textoControlesB.destroy();
+          this.controlesBMostrados = false;
+        }
+      }
+    }
   }
 }
