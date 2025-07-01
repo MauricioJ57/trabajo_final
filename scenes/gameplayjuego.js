@@ -131,13 +131,6 @@ export default class gameplay extends Phaser.Scene {
     });
     this.oleadatext.setDepth(1000);
 
-    this.vidasText = this.add.text(16, 150, 'Vidas: 3', {
-      fontSize: '24px',
-      fill: '#fff',
-      fontFamily: 'arial',
-    });
-    this.vidasText.setDepth(1000);
-
     this.timeleft = this.time.addEvent({
       delay: 1000,
       callback: () => {
@@ -254,7 +247,7 @@ export default class gameplay extends Phaser.Scene {
     // informacion de player
 
     // Mostrar vidas en pantalla
-    this.vidasText = this.add.text(16, 150, 'Vidas: ', {
+    this.vidasText = this.add.text(16, 100, 'Vidas:', {
       fontSize: '24px',
       fill: '#fff',
       fontFamily: 'arial',
@@ -365,28 +358,6 @@ export default class gameplay extends Phaser.Scene {
         enemyBullet.destroy();
       }
     ); //colision ente balas de jugador y enemigas
-
-    const pausabutton = this.add.image(650, 45, 'pausa');
-    pausabutton.setSize(36, 36);
-    pausabutton.setInteractive();
-    pausabutton.on('pointerover', () => {
-      pausabutton.setTint(0xfdd700);
-    });
-    pausabutton.on('pointerout', () => {
-      pausabutton.clearTint(); 
-    });
-    pausabutton.depth = 1;
-    //boton de pausa
-
-    pausabutton.once('pointerup', () => {
-      this.scene.pause();
-      const pausaText = this.add.text(250, 300, "PAUSA", {
-        fontSize: "64px",
-        fill: "#fff",
-        fontFamily: "arial",
-      }).setOrigin(0, 0);
-      pausaText.setDepth(2000);
-    }); //texto de pausa
 
     // --- PATRONES DE BALAS ---
 
