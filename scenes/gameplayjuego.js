@@ -5,7 +5,7 @@ export default class gameplay extends Phaser.Scene {
 
   init() {
     this.score = 0;
-    this.timer = 10;
+    this.timer = 60;
     this.oleada = 1;
     this.tiempoTotal = 0; // tiempo total de supervivencia
   }
@@ -150,7 +150,7 @@ export default class gameplay extends Phaser.Scene {
           if (this.spawnPatternCircleRight) this.spawnPatternCircleRight.paused = true;
           this.timertext.setText('Oleada terminada');
           this.time.delayedCall(6000, () => {
-            this.timer = 10;
+            this.timer = 60;
             this.timertext.setText(`${this.timer}`);
             this.spawnBulletsup.paused = false;
             if (this.circlebullets) this.circlebullets.paused = false;
