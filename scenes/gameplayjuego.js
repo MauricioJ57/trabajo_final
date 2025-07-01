@@ -37,7 +37,6 @@ export default class gameplay extends Phaser.Scene {
     this.load.image('oleadaboton', "public/assets/boton de oleada.png")
     this.load.image('hudscore', "public/assets/hud de score.png");
     this.load.image('nave escudo', "public/assets/nave escudo.png");
-    this.load.audio('explosion de balas', "public/assets/explosion de balas2.wav");
     this.load.image('bala del jugador', "public/assets/bala de jugador.png");
     this.load.image('boton de habilidad', "public/assets/boton de habilidad 3.png");
 
@@ -342,7 +341,6 @@ export default class gameplay extends Phaser.Scene {
         this.scoretext.setText("Score: " + this.score);
         playerBullet.destroy();
         enemyBullet.destroy();
-        if (this.explosionAudio) this.explosionAudio.play();
       }
     );
     this.physics.add.overlap(
@@ -354,7 +352,6 @@ export default class gameplay extends Phaser.Scene {
         this.scoretext.setText("Score: " + this.score);
         playerBullet.destroy();
         enemyBullet.destroy();
-        if (this.explosionAudio) this.explosionAudio.play();
       }
     );
     this.physics.add.overlap(
@@ -366,7 +363,6 @@ export default class gameplay extends Phaser.Scene {
         this.scoretext.setText("Score: " + this.score);
         playerBullet.destroy();
         enemyBullet.destroy();
-        if (this.explosionAudio) this.explosionAudio.play();
       }
     ); //colision ente balas de jugador y enemigas
 
@@ -428,9 +424,6 @@ export default class gameplay extends Phaser.Scene {
       },
       loop: true,
     });
-
-    // Guardar referencia al audio
-    this.explosionAudio = this.sound.add('explosion de balas');
 
     // Texto de ayuda para controles de movimiento
     this.controlesMostrados = true;
@@ -506,7 +499,6 @@ export default class gameplay extends Phaser.Scene {
           this.score += value;
           this.scoretext.setText("Score: " + this.score);
           enemyBullet.destroy();
-          if (this.explosionAudio) this.explosionAudio.play();
         });
         this.laserCollider.push(collider);
       });
@@ -547,7 +539,6 @@ export default class gameplay extends Phaser.Scene {
       this.escudoCollider = this.physics.add.overlap(this.escudoSprite, this.bullets, (escudo, enemyBullet) => {
         this.escudoHits--;
         enemyBullet.destroy();
-        if (this.explosionAudio) this.explosionAudio.play();
         if (this.escudoHits <= 0) {
           this.escudoActive = false;
           if (this.escudoSprite) {
