@@ -206,7 +206,7 @@ export default class gameplay extends Phaser.Scene {
           weightedBalaKeys = ['bala', 'bala', 'bala_electrica', 'bala_veloz', 'bala_verde', 'bala_naranja'];
         } else {
           weightedBalaKeys = ['bala', 'bala', 'bala_electrica', 'bala_veloz', 'bala_verde', 'bala_naranja', 'bala_negra'];
-        } //añade prioridad a las balas segun la oleada superada
+        }
         const balaSeleccionada = Phaser.Math.RND.pick(weightedBalaKeys);
         const lado = Phaser.Math.Between(0, 2);
         let x, y, velX = 0, velY = 0;
@@ -237,6 +237,11 @@ export default class gameplay extends Phaser.Scene {
         } else {
           shape.setVelocity(velX, velY);
         }
+        // Apuntar el sprite según la dirección de la velocidad
+        if (velX !== 0 || velY !== 0) {
+          const angle = Math.atan2(velY, velX);
+          shape.setRotation(angle + Phaser.Math.DegToRad(90));
+        }
       },
       loop: true,
     }); //funcion para generar balas aleatorias
@@ -256,13 +261,13 @@ export default class gameplay extends Phaser.Scene {
 
     this.bulletsplayer = this.physics.add.group();
     this.input.keyboard.on("keydown-SPACE", () => {
-      const bulletp = this.bulletsplayer.create(this.player.x + 20, this.player.y - 20, 'bala del jugador');
+      const bulletp = this.bulletsplayer.create(this.player.x + 20, this.player.y - 10, 'bala del jugador');
       bulletp.setVelocityY(-300);
     }); // funcion para disparar balas
 
     this.bulletsplayer2 = this.physics.add.group();
     this.input.keyboard.on("keydown-SPACE", () => {
-      const bulletp2 = this.bulletsplayer2.create(this.player.x - 20, this.player.y - 20, 'bala del jugador');
+      const bulletp2 = this.bulletsplayer2.create(this.player.x - 20, this.player.y - 10, 'bala del jugador');
       bulletp2.setVelocityY(-300);
     }); // funcion para disparar balas
 
@@ -270,6 +275,18 @@ export default class gameplay extends Phaser.Scene {
     this.input.keyboard.on("keydown-SPACE", () => {
       const bulletp3 = this.bulletsplayer3.create(this.player.x, this.player.y - 20, 'bala del jugador');
       bulletp3.setVelocityY(-300);
+    }); // funcion para disparar balas
+
+    this.bulletsplayer4 = this.physics.add.group();
+    this.input.keyboard.on("keydown-SPACE", () => {
+      const bulletp4 = this.bulletsplayer4.create(this.player.x + 10, this.player.y - 15, 'bala del jugador');
+      bulletp4.setVelocityY(-300);
+    }); // funcion para disparar balas
+
+    this.bulletsplayer5 = this.physics.add.group();
+    this.input.keyboard.on("keydown-SPACE", () => {
+      const bulletp5 = this.bulletsplayer5.create(this.player.x - 10, this.player.y - 15, 'bala del jugador');
+      bulletp5.setVelocityY(-300);
     }); // funcion para disparar balas
 
     // Guardar el collider entre el jugador y las balas para poder activarlo/desactivarlo

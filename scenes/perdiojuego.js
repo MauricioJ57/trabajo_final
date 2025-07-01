@@ -28,9 +28,16 @@ export default class perdio extends Phaser.Scene {
             fill: '#fff',
             fontFamily: 'arial',
         }).setOrigin(0.5);
+
+        this.restartKey = this.input.keyboard.addKey(
+        Phaser.Input.Keyboard.KeyCodes.R
+        );// controles
     }
 
     update() {
+        if (this.restartKey.isDown) {
+        this.scene.start("portada");
+        } // boton de reinicio
         
     }
 }
