@@ -45,10 +45,12 @@ export default class pantallaSeleccion extends Phaser.Scene {
 
         // Variable para la nave seleccionada
         this.naveSeleccionada = null;
+        this.navePreview = null; // Sprite de la nave seleccionada en pantalla
         // Mostrar selección y guardar valor
         container_d.on('pointerup', () => {
           this.naveSeleccionada = 'ejemplo nave dash';
-          this.add.image(590, 250, 'ejemplo nave dash').setOrigin(0, 0);
+          if (this.navePreview) this.navePreview.destroy();
+          this.navePreview = this.add.image(590, 250, 'ejemplo nave dash').setOrigin(0, 0);
         });
 
         const escudo = this.add.image(0, 0, 'naveescudoselector')
@@ -65,7 +67,8 @@ export default class pantallaSeleccion extends Phaser.Scene {
 
         container_e.on('pointerup', () => {
           this.naveSeleccionada = 'ejemplo nave escudo';
-          this.add.image(600, 250, 'ejemplo nave escudo').setOrigin(0, 0);
+          if (this.navePreview) this.navePreview.destroy();
+          this.navePreview = this.add.image(600, 250, 'ejemplo nave escudo').setOrigin(0, 0);
         });
 
         const rayo_grande = this.add.image(0, 0, 'naverayograndeselector');
@@ -82,7 +85,8 @@ export default class pantallaSeleccion extends Phaser.Scene {
 
         container_rg.on('pointerup', () => {
           this.naveSeleccionada = 'ejemplo nave rayo grande';
-          this.add.image(590, 250, 'ejemplo nave rayo grande').setOrigin(0, 0);
+          if (this.navePreview) this.navePreview.destroy();
+          this.navePreview = this.add.image(590, 250, 'ejemplo nave rayo grande').setOrigin(0, 0);
         });
         
         const botonJugar = this.add.image(0, 0, 'boton jugar');
