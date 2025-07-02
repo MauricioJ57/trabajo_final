@@ -18,8 +18,8 @@ export default class pantallaSeleccion extends Phaser.Scene {
         this.load.image('nave seleccionada', "public/assets/imagen de nave seleccionada.png");
         this.load.image('boton jugar', "public/assets/boton jugar.png");
         this.load.image('ejemplo nave escudo', "public/assets/nave escudo.png");
-        this.load.image('ejemplo nave dash', "public/assets/New Piskel.png");
-        this.load.image('ejemplo nave rayo grande', "public/assets/boceto nave 1.png");
+        this.load.image('ejemplo nave dash', "public/assets/nave dash (final).png");
+        this.load.image('ejemplo nave rayo grande', "public/assets/nave rayo.png");
     }
 
     create() {

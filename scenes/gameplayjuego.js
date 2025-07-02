@@ -13,9 +13,7 @@ export default class gameplay extends Phaser.Scene {
   preload() {
     this.load.image("bala normal", "public/assets/bala normal(renovada).png");
     this.load.image("bala_electrica", "public/assets/bala electrica.png");
-    this.load.image("boceto nave inical", "public/assets/boceto nave 1.png");
     this.load.image("revenator", "public/assets/revenator.png");
-    this.load.image("navedash", "public/assets/boceto nave dash 2.png");
     this.load.image("bala", "public/assets/bala normal(renovada).png");
     this.load.image("bala_naranja", "public/assets/bala naranja.png");
     this.load.image("bala_verde", "public/assets/bala verde.png");
@@ -588,6 +586,7 @@ export default class gameplay extends Phaser.Scene {
         laserSprite.body.immovable = true;
         this.laserSprites.push(laserSprite);
       }
+      this.player.setDepth(1000)
       // No crear escudo aquí
       // Activar colisión entre cada sprite del láser y las balas enemigas
       this.laserCollider = [];
@@ -755,7 +754,7 @@ export default class gameplay extends Phaser.Scene {
       this.bullets.getChildren().forEach(bullet => {
         if (
           bullet.x < -50 || bullet.x > 950 ||
-          bullet.y < -50 || bullet.y > 650
+          bullet.y < -50 || bullet.y > 720
         ) {
           bullet.destroy();
         }
@@ -763,7 +762,7 @@ export default class gameplay extends Phaser.Scene {
       this.bossBullets.getChildren().forEach(bullet => {
         if (
           bullet.x < -50 || bullet.x > 950 ||
-          bullet.y < -50 || bullet.y > 650
+          bullet.y < -50 || bullet.y > 720
         ) {
           bullet.destroy();
         }
