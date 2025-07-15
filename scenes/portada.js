@@ -9,7 +9,6 @@ export default class portada extends Phaser.Scene {
 
   preload () {
     this.load.image('fondo de boton', 'public/assets/fondo de boton.png');
-    this.load.image('boceto nave 1', 'public/assets/boceto nave 1.png');
     this.load.image('fondo de portada', "public/assets/fondo de portada.jpg");
     this.load.image('logo del juego', "public/assets/logo del juego.png");
 
